@@ -22,6 +22,7 @@ namespace e_Dnevnik {
         }
 
         private void Form1_Load(object sender, EventArgs e) {
+            idx = 0;
             getData();
             refresh();
         }
@@ -31,7 +32,6 @@ namespace e_Dnevnik {
             SqlDataAdapter adapter = new SqlDataAdapter("select * from osoba", connection);
             table = new DataTable();
             adapter.Fill(table);
-            idx = 0;
         }
 
         private void refresh() {
@@ -98,9 +98,57 @@ namespace e_Dnevnik {
                 connection.Open();
                 command.ExecuteNonQuery();
                 connection.Close();
+                getData();
+                idx = table.Rows.Count - 1;
+                refresh();
             } catch ( Exception ex ){
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e) {
+            string commandStr =
+                $"update osoba set ime = '{textBox2.Text}', " +
+                $"prezime = '{textBox3.Text}', " +
+                $"adresa = '{textBox4.Text}', " +
+                $"jmbg = '{textBox5.Text}', " +
+                $"email = '{textBox6.Text}', " +
+                $"pass = '{textBox7.Text}', " +
+                $"uloga = '{textBox8.Text}' " +
+                $"where id = {textBox1.Text}";
+            SqlConnection connection = Connection.Connect();
+            SqlCommand command = new SqlCommand(commandStr, connection);
+            try {
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+                getData();
+                refresh();
+            } catch ( Exception ex ){
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void btnDel_Click(object sender, EventArgs e) {
+            string commandStr = "delete from osoba where id = " + textBox1.Text;
+            SqlConnection connection = Connection.Connect();
+            SqlCommand command = new SqlCommand(commandStr, connection);
+            try {
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+                getData();
+                idx--;
+                if ( idx < 0 ) idx = 1;
+                refresh();
+            } catch ( Exception ex ){
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void btnExit_Click(object sender, EventArgs e) {
+            Application.Exit();
         }
     }
 }
